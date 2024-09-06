@@ -1,4 +1,8 @@
 import { Module } from '@nestjs/common';
+import { MoviesService } from './movies/movies.service';
 
-@Module({})
+@Module({
+  providers: [MoviesService],
+  exports: [MoviesService],
+})
 export class UtilsModule {}
