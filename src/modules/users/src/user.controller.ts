@@ -1,10 +1,13 @@
 import { Controller, Get } from '@nestjs/common';
-import { MoviesService } from 'src/modules/utils';
+import { UserRecord } from 'src/modules/repository';
+import { UserService } from './user.service';
 
-@Controller()
+@Controller('/users')
 export class UserController {
-  constructor(private readonly moviesService: MoviesService) {}
+  constructor(private readonly userService: UserService) {}
 
   @Get()
-  async testingEndpoint() {}
+  async getAllUsers() {
+    const userList: UserRecord[] = await this.userService.getUserList();
+  }
 }

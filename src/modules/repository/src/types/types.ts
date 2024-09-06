@@ -21,4 +21,6 @@ export interface UserToCreate extends UserCreateInput {
   createdBy: string;
 }
 
-export interface UserToUpdate extends UserUpdateInput {}
+export interface UserToUpdate extends Omit<UserUpdateInput, 'userId'> {
+  updatedBy: string;
+}
