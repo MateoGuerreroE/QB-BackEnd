@@ -27,6 +27,16 @@ export class UserRepository {
     });
   }
 
+  async updateUserFavorites(
+    userId: string,
+    newFavs: string[],
+  ): Promise<UserRecord> {
+    return this.prisma.user.update({
+      where: { userId },
+      data: { favorites: newFavs },
+    });
+  }
+
   async updateUser(userId: string, user: UserToUpdate): Promise<UserRecord> {
     return this.prisma.user.update({
       where: { userId },
