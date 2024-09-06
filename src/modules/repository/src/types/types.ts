@@ -7,6 +7,7 @@ export interface UserRecord {
   lastName: string;
   emailAddress: string;
   isEnabled: boolean;
+  favorites: string[];
   isDeleted: boolean;
   createdAt: Date;
   createdBy: string;
