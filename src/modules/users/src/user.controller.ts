@@ -1,14 +1,17 @@
 import { Controller, Get } from '@nestjs/common';
 import { MoviesService } from 'src/modules/utils/src/movies/movies.service';
-import { MovieData, MovieResponse } from '../../utils';
+import { MovieResponse } from '../../utils';
+import { UserRepository } from 'src/modules/repository/src/user.repository';
 
 @Controller()
 export class UserController {
-  constructor(private readonly moviesService: MoviesService) {}
+  constructor(
+    private readonly moviesService: MoviesService,
+    private readonly userRepository: UserRepository,
+  ) {}
 
   @Get()
   async testingEndpoint() {
-    const movieList: MovieResponse = await this.moviesService.getMovieList();
-    return movieList;
+    await this.userRepository.createUser();
   }
 }
