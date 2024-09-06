@@ -11,7 +11,7 @@ export class ApplicationResponse<T extends object = {}> extends Response {
 }
 
 export class ErrorResponse extends HttpException {
-  privatemessage: string;
+  message: string;
   statusCode: number;
   trace?: any;
 
