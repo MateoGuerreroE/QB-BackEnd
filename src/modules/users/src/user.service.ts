@@ -4,8 +4,10 @@ import { UserRepository } from 'src/modules/repository';
 import { UserCreateInput } from 'src/modules/repository/src/dtos/UserCreateInput.dto';
 import { UserUpdateInput } from 'src/modules/repository/src/dtos/UserUpdateInput.dto';
 import { ApplicationError } from 'src/modules/utils';
+import { NotFoundError } from 'src/modules/utils';
 
 @Injectable()
+// TODO CREATE UTIL FOR VALIDATE ID INTEGRITY
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
@@ -16,8 +18,7 @@ export class UserService {
   async getUser(userId: string): Promise<UserRecord> {
     const result = await this.userRepository.getUserById(userId);
     if (!result) {
-      // TODO IMPLEMENT CUSTOM NOTFOUND ERROR
-      return;
+      throw new NotFoundError('User', userId);
     }
     return result;
   }
@@ -25,8 +26,7 @@ export class UserService {
   async getUserByEmail(userEmail: string): Promise<UserRecord> {
     const result = await this.userRepository.getUserByEmail(userEmail);
     if (!result) {
-      // TODO IMPLEMENT CUSTOM NOTFOUND ERROR
-      return;
+      throw new NotFoundError('User', userEmail);
     }
     return result;
   }
@@ -69,8 +69,7 @@ export class UserService {
     // Ensure user exists
     const user = await this.userRepository.getUserById(userId);
     if (!user) {
-      // TODO IMPLEMENT CUSTOM NOTFOUND ERROR
-      return;
+      throw new NotFoundError('User to Update', userId);
     }
     const isUpdaterValid = await this.verifyUserExistence(updaterId);
     if (!isUpdaterValid) {
@@ -90,8 +89,7 @@ export class UserService {
   async deleteUser(userId: string, deletorId: string): Promise<void> {
     const user = await this.userRepository.getUserById(userId);
     if (!user) {
-      // TODO IMPLEMENT CUSTOM NOTFOUND ERROR
-      return;
+      throw new NotFoundError('User to Delete', userId);
     }
     const isDeletorValid = this.verifyUserExistence(deletorId);
     if (!isDeletorValid) {
@@ -105,7 +103,7 @@ export class UserService {
   }
 
   /**
-   * Util private method to validate If user exists,
+   * Util private method to validate If user exists and is Enabled,
    * but does not return user information. Expected to be
    * used in validating If user exists before sending It to
    * repo
@@ -123,7 +121,7 @@ export class UserService {
     } else {
       throw new ApplicationError('Invalid verifyUserExistence method use');
     }
-    if (user) {
+    if (user && user.isEnabled) {
       return true;
     }
     return false;
