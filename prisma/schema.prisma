@@ -12,10 +12,12 @@ model User {
 
     firstName    String
     lastName     String
-    emailAddress String
+    emailAddress String @unique
 
     isEnabled Boolean @default(true)
-    isDeteled Boolean @default(false)
+    isDeleted Boolean @default(false)
+
+    favorites String[] @default([])
 
     createdAt DateTime @default(now())
     createdBy String
