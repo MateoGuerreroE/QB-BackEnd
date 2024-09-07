@@ -6,7 +6,7 @@ import {
   ErrorResponse,
   UnauthorizedError,
 } from 'src/modules/utils';
-import { UserCreateInput } from 'src/modules/repository/src/dtos/UserCreateInput.dto';
+import { UserCreateInput } from 'src/modules/repository';
 
 @Controller('/auth')
 export class AuthController {
@@ -33,7 +33,14 @@ export class AuthController {
   }
 
   @Post('/register')
-  async register(@Body() userInput: UserCreateInput) {
-    await this.authService.registerUser(userInput);
+  async register(
+    @Body() userInput: UserCreateInput,
+  ): Promise<ControllerResponse> {
+    try {
+      const userResult = await this.authService.registerUser(userInput);
+      return new ApplicationResponse(userResult, 201);
+    } catch (error: any) {
+      throw new ErrorResponse(error.message, error.status);
+    }
   }
 }
