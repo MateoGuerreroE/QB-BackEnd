@@ -4,4 +4,5 @@ export class UserCreateInput {
   emailAddress!: string;
   isEnabled?: boolean;
   createdBy?: string;
+  secret: string;
 }

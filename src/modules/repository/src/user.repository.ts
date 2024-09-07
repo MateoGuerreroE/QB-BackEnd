@@ -1,21 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
-import { UserRecord, UserToCreate, UserToUpdate } from './types';
+import { RawUserRecord, UserRecord, UserToCreate, UserToUpdate } from './types';
 
 @Injectable()
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async getAllUsers(): Promise<UserRecord[]> {
-    return this.prisma.user.findMany();
+    return this.prisma.user.findMany({ ...this.omitSecret() });
+  }
+
+  getRawUserByEmail(email: string): Promise<RawUserRecord | null> {
+    return this.prisma.user.findUnique({ where: { emailAddress: email } });
   }
 
   async getUserById(userId: string): Promise<UserRecord | null> {
-    return this.prisma.user.findUnique({ where: { userId } });
+    return this.prisma.user.findUnique({
+      where: { userId },
+      ...this.omitSecret(),
+    });
   }
 
   async getUserByEmail(emailAddress: string): Promise<UserRecord | null> {
-    return this.prisma.user.findUnique({ where: { emailAddress } });
+    return this.prisma.user.findUnique({
+      where: { emailAddress },
+      ...this.omitSecret(),
+    });
   }
 
   async createUser(user: UserToCreate): Promise<UserRecord> {
@@ -24,6 +34,7 @@ export class UserRepository {
         ...user,
         updatedBy: user.createdBy,
       },
+      ...this.omitSecret(),
     });
   }
 
@@ -34,6 +45,7 @@ export class UserRepository {
     return this.prisma.user.update({
       where: { userId },
       data: { favorites: newFavs },
+      ...this.omitSecret(),
     });
   }
 
@@ -44,6 +56,7 @@ export class UserRepository {
     return this.prisma.user.update({
       where: { userId },
       data: attributesToUpdate,
+      ...this.omitSecret(),
     });
   }
 
@@ -63,5 +76,9 @@ export class UserRepository {
       },
     });
     return;
+  }
+
+  private omitSecret() {
+    return { omit: { secret: true } };
   }
 }
