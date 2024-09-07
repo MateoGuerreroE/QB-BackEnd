@@ -26,7 +26,6 @@ export class AuthService {
   }
 
   async registerUser(userInput: UserCreateInput): Promise<UserRecord> {
-    // TODO REMOVE THIS AND ADD CLASS VALIDATIONS
     if (!userInput.secret) {
       throw new ApplicationError('Password is needed');
     }

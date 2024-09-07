@@ -1,18 +1,22 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
   HttpCode,
   HttpStatus,
   Param,
+  Post,
   Query,
 } from '@nestjs/common';
-import { UserRecord } from 'src/modules/repository';
+import { UserRecord, UserUpdateInput } from 'src/modules/repository';
 import { UserService } from './user.service';
 import {
+  ApplicationError,
   ApplicationResponse,
   ControllerResponse,
   ErrorResponse,
+  validateClassComposition,
 } from 'src/modules/utils';
 import { NotFoundError } from 'src/modules/utils';
 
@@ -49,6 +53,27 @@ export class UserController {
       if (error instanceof NotFoundError) {
         console.log(error.getDebugMessage());
       }
+      throw new ErrorResponse(error.message, error.status);
+    }
+  }
+
+  @Post('/update/:id')
+  @HttpCode(HttpStatus.ACCEPTED)
+  async updateUser(
+    @Param('id') id: string,
+    @Body() user: UserUpdateInput,
+  ): Promise<ControllerResponse> {
+    try {
+      const errors = await validateClassComposition(UserUpdateInput, user);
+      if (errors.length) {
+        throw new ApplicationError(errors.join(', '), 400);
+      }
+      const result = await this.userService.updateUser(
+        user,
+        '66da741be1f11400d7d3e031',
+      );
+      return new ApplicationResponse(result, 202);
+    } catch (error: any) {
       throw new ErrorResponse(error.message, error.status);
     }
   }
