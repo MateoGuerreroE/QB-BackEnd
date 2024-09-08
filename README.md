@@ -16,7 +16,7 @@ To check FrontEnd repository, built in with Next.js, check [this link]()
 
 ## Installation
 
-Dillinger requires [Node.js](https://nodejs.org/) and [Nestjs]() to run
+This app requires [Node.js](https://nodejs.org/) and [Nestjs]() to run
 
 Clone repository and run dependency installation in your package manager
 
