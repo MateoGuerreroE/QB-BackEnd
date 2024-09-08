@@ -44,7 +44,6 @@ export class MoviesService {
   }
 
   private async getAllMoviesFromPageCount(path: string, times: number) {
-    console.log(times);
     const movies: MovieResponse = {
       page: 1,
       results: [],
