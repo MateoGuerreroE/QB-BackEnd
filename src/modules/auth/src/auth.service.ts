@@ -38,7 +38,7 @@ export class AuthService {
       userInput.emailAddress,
     );
     if (existingEmail) {
-      throw new ApplicationError('Email is in use', 406);
+      throw new ApplicationError('Email is in use', 409);
     }
     try {
       const result = await this.userRepository.createUser(userToCreate);
