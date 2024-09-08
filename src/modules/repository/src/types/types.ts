@@ -17,6 +17,10 @@ export interface UserRecord {
   deletedBy?: string;
 }
 
+export interface RawUserRecord extends UserRecord {
+  secret: string;
+}
+
 export interface UserToCreate extends UserCreateInput {
   createdBy: string;
 }

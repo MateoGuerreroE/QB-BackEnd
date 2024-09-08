@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { UserRecord, UserToCreate, UserToUpdate } from 'src/modules/repository';
 import { UserRepository } from 'src/modules/repository';
-import { UserCreateInput } from 'src/modules/repository/src/dtos/UserCreateInput.dto';
-import { UserUpdateInput } from 'src/modules/repository/src/dtos/UserUpdateInput.dto';
+import { UserCreateInput } from 'src/modules/repository';
+import { UserUpdateInput } from 'src/modules/repository';
 import { ApplicationError } from 'src/modules/utils';
 import { NotFoundError } from 'src/modules/utils';
 
