@@ -3,10 +3,16 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 export class ApplicationResponse<T extends object = {}> extends Response {
   data: Record<string, any>;
   statusCode: number;
-  constructor(data: T | T[], statusCode: number) {
+  metadata?: Record<string, any>;
+  constructor(
+    data: T | T[],
+    statusCode: number,
+    metadata?: Record<string, any>,
+  ) {
     super();
     this.data = data;
     this.statusCode = statusCode;
+    this.metadata = metadata;
   }
 }
 
