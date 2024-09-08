@@ -9,14 +9,14 @@ Specially this BackEnd repository implements mainly:
 
 - Nestjs with MongoDB and Prisma
 - Layered strcuture (MVC) in several modules, all integrating back to
-    an app module
+  an app module
 - Basic auth system with no third-party providers
 
-To check FrontEnd repository, built in with Next.js, check [this link]()
+To check FrontEnd repository, built in with Next.js, check [this link](https://github.com/MateoGuerreroE/QB-FrontEnd)
 
 ## Installation
 
-This app requires [Node.js](https://nodejs.org/) and [Nestjs]() to run
+Dillinger requires [Node.js](https://nodejs.org/) and [Nestjs](https://nestjs.com) to run
 
 Clone repository and run dependency installation in your package manager
 
@@ -30,6 +30,7 @@ $ pnpm run start:dev
 # production mode
 $ pnpm run start:prod
 ```
+
 Then simply start the application using the Nestjs built-in cmds, for watch mode
 simply add :dev at the command line
 
@@ -41,18 +42,18 @@ pnpm start:dev
 ## Documentation
 
 There's basically just CRUD routes for users and a login and register
-controller route, plus the exteranl API call. For full documentation, please refer
-to our swagger detailedroute docs [here]()
+controller route, plus the external API call. For full documentation, please refer
+to our swagger detailed API docs [here](https://app.swaggerhub.com/apis/MATEOF1223/QB-Project/1.0.0#/)
 
 ## Main dependencies
 
 This backend is currently extended with the following main dependencies.
 Details on how we use them in this application are shown below.
 
-| Dependency | Use |
-| ------ | ------ |
-| prisma | ORM & Database Connection |
-| bcrypt | Password hashing / validation |
+| Dependency      | Use                              |
+| --------------- | -------------------------------- |
+| prisma          | ORM & Database Connection        |
+| bcrypt          | Password hashing / validation    |
 | class-validator | Validate received data intergity |
 
 ## Support
