@@ -4,13 +4,13 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Observable } from 'rxjs';
+import { UserRecord } from 'src/modules/repository';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    console.log(context.switchToHttp().getRequest());
+    const result = (await super.canActivate(context)) as boolean;
     const request = context.switchToHttp().getRequest();
     const user = request.user;
     if (!user) {
@@ -19,11 +19,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     if (!this.isUserValid(user)) {
       throw new UnauthorizedException('User disabled access');
     }
-    return super.canActivate(context) as Promise<boolean>;
+    return result;
   }
 
-  // TODO Stringly type this
-  private isUserValid(user: any): boolean {
+  private isUserValid(user: Partial<UserRecord>): boolean {
     if (!user.isEnabled || user.isDeleted) {
       return false;
     }
