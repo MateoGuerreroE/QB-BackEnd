@@ -127,7 +127,7 @@ export class UserService {
   ): Promise<void> {
     let user: UserRecord | null;
     if (userId) {
-      isValidHexId(userId);
+      isValidHexId(userId, 'for operation issuer');
       user = await this.userRepository.getUserById(userId);
     } else if (emailAddress) {
       user = await this.userRepository.getUserByEmail(emailAddress);
