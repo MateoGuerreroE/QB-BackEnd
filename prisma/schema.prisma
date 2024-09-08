@@ -1,0 +1,31 @@
+datasource db {
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["omitApi"]
+}
+
+model User {
+    userId String @id @default(auto()) @map("_id") @db.ObjectId
+
+    firstName    String
+    lastName     String
+    emailAddress String @unique
+
+    isEnabled Boolean @default(true)
+    isDeleted Boolean @default(false)
+
+    favorites String[] @default([])
+
+    createdAt DateTime @default(now())
+    createdBy String
+    updatedAt DateTime @default(now())
+    updatedBy String
+    secret    String?
+
+    deletedAt DateTime?
+    deletedBy String?
+}
