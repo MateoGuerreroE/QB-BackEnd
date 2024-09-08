@@ -3,11 +3,14 @@ import { UserRecord, UserToCreate, UserToUpdate } from 'src/modules/repository';
 import { UserRepository } from 'src/modules/repository';
 import { UserCreateInput } from 'src/modules/repository';
 import { UserUpdateInput } from 'src/modules/repository';
-import { ApplicationError } from 'src/modules/utils';
+import {
+  ApplicationError,
+  isValidHexId,
+  UnauthorizedError,
+} from 'src/modules/utils';
 import { NotFoundError } from 'src/modules/utils';
 
 @Injectable()
-// TODO CREATE UTIL FOR VALIDATE ID INTEGRITY
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
@@ -16,6 +19,7 @@ export class UserService {
   }
 
   async getUser(userId: string): Promise<UserRecord> {
+    isValidHexId(userId, 'userId');
     const result = await this.userRepository.getUserById(userId);
     if (!result) {
       throw new NotFoundError('User', userId);
@@ -31,6 +35,13 @@ export class UserService {
     return result;
   }
 
+  /**
+   * @ignore Not in use -
+   * Reference method, not currently used
+   * as user creation is done through register.
+   * This may be used in the future If user can be created
+   * in any other way.
+   */
   async createUser(
     userInfo: UserCreateInput,
     creatorId: string,
@@ -39,16 +50,11 @@ export class UserService {
       ...userInfo,
       createdBy: creatorId,
     };
-    const isEmailInUse = await this.verifyUserExistence(
-      null,
-      userInfo.emailAddress,
-    );
-    const isCreatorValid = await this.verifyUserExistence(creatorId);
-    if (isEmailInUse) {
-      throw new ApplicationError('Email is in use', 409);
-    } else if (!isCreatorValid) {
-      throw new ApplicationError('Invalid creator', 400);
-    }
+    try {
+      await this.verifyUserExistence('', null, userToCreate.emailAddress);
+      throw new ApplicationError('Email is in use', 409); // Throw error If user found
+    } catch (error: any) {}
+    await this.verifyUserExistence('creator', creatorId);
     try {
       const result = await this.userRepository.createUser(userToCreate);
       return result;
@@ -61,7 +67,14 @@ export class UserService {
     userInfo: UserUpdateInput,
     updaterId: string,
   ): Promise<UserRecord> {
+    isValidHexId(userInfo.userId, 'user to update');
     const { userId, ...updates } = userInfo;
+    if ((updates as any).secret) {
+      throw new UnauthorizedError(
+        'Invalid operation',
+        'secret not allowed for change in this route',
+      );
+    }
     const userToUpdate: UserToUpdate = {
       ...updates,
       updatedBy: updaterId,
@@ -71,10 +84,7 @@ export class UserService {
     if (!user) {
       throw new NotFoundError('User to Update', userId);
     }
-    const isUpdaterValid = await this.verifyUserExistence(updaterId);
-    if (!isUpdaterValid) {
-      throw new ApplicationError('Invalid updater', 400);
-    }
+    await this.verifyUserExistence('updater', updaterId);
     try {
       const result = await this.userRepository.updateUser(
         user.userId,
@@ -87,6 +97,7 @@ export class UserService {
   }
 
   async deleteUser(userId: string, deletorId: string): Promise<void> {
+    isValidHexId(userId, 'user to delete');
     const user = await this.userRepository.getUserById(userId);
     if (!user) {
       throw new NotFoundError('User to Delete', userId);
@@ -110,20 +121,24 @@ export class UserService {
    * @param userId
    */
   private async verifyUserExistence(
+    name: string,
     userId?: string,
     emailAddress?: string,
-  ): Promise<boolean> {
+  ): Promise<void> {
     let user: UserRecord | null;
     if (userId) {
+      isValidHexId(userId);
       user = await this.userRepository.getUserById(userId);
     } else if (emailAddress) {
       user = await this.userRepository.getUserByEmail(emailAddress);
     } else {
       throw new ApplicationError('Invalid verifyUserExistence method use');
     }
-    if (user && user.isEnabled) {
-      return true;
+    if (!user) {
+      throw new NotFoundError(`${name} not found`, userId ?? emailAddress);
     }
-    return false;
+    if (!user.isEnabled || user.isDeleted) {
+      throw new UnauthorizedError(`${name} not able to perform this operation`);
+    }
   }
 }

@@ -6,21 +6,21 @@ import {
   ErrorResponse,
   UnauthorizedError,
 } from 'src/modules/utils';
+import { UserLoginData } from './dtos/UserLoginData.dto';
 import { UserCreateInput } from 'src/modules/repository';
+import { validateClassComposition } from 'src/modules/utils';
 
 @Controller('/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('/login')
-  async login(
-    @Body() userInfo: { emailAddress: string; password: string },
-  ): Promise<ControllerResponse> {
-    // TODO REMOVE THIS AND ADD CLASS VALIDATIONS
-    const { emailAddress, password } = userInfo;
-    if (!emailAddress || !password) {
-      throw new ErrorResponse('Missing credentials');
+  async login(@Body() userInfo: UserLoginData): Promise<ControllerResponse> {
+    const classErrors = await validateClassComposition(UserLoginData, userInfo);
+    if (classErrors.length) {
+      throw new ErrorResponse(classErrors.join(', '), 400);
     }
+    const { emailAddress, password } = userInfo;
     try {
       const user = await this.authService.loginUser(emailAddress, password);
       return new ApplicationResponse(user, 200);
@@ -37,6 +37,10 @@ export class AuthController {
     @Body() userInput: UserCreateInput,
   ): Promise<ControllerResponse> {
     try {
+      const errors = await validateClassComposition(UserCreateInput, userInput);
+      if (errors.length) {
+        throw new ErrorResponse(errors.join(', '));
+      }
       const userResult = await this.authService.registerUser(userInput);
       return new ApplicationResponse(userResult, 201);
     } catch (error: any) {
