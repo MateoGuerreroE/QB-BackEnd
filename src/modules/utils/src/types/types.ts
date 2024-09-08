@@ -1,3 +1,5 @@
+import { UserRecord } from 'src/modules/repository';
+
 export interface MovieData {
   poster_path: string;
   adult: boolean;
@@ -20,4 +22,8 @@ export interface MovieResponse {
   results: MovieData[];
   total_pages: number;
   total_results: number;
+}
+
+export interface SignedRequest extends Request {
+  user?: Partial<UserRecord>;
 }

@@ -8,6 +8,8 @@ import {
   Param,
   Post,
   Query,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { UserRecord, UserUpdateInput } from 'src/modules/repository';
 import { UserService } from './user.service';
@@ -16,23 +18,24 @@ import {
   ApplicationResponse,
   ControllerResponse,
   ErrorResponse,
+  SignedRequest,
   UnauthorizedError,
   validateClassComposition,
 } from 'src/modules/utils';
 import { NotFoundError } from 'src/modules/utils';
+import { JwtAuthGuard } from 'src/modules/auth';
 
 @Controller('/users')
-// TODO ADD AUTH GUARD FOR EXTRACTING AUTHOR
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
+  @UseGuards(JwtAuthGuard)
   @Get()
   @HttpCode(HttpStatus.OK)
   async getAllUsers(): Promise<ControllerResponse> {
     const userList: UserRecord[] = await this.userService.getUserList();
     return new ApplicationResponse(userList, 200);
   }
-
+  @UseGuards(JwtAuthGuard)
   @Get('/find')
   @HttpCode(HttpStatus.OK)
   async getUser(
@@ -57,22 +60,25 @@ export class UserController {
       throw new ErrorResponse(error.message, error.status);
     }
   }
-
+  @UseGuards(JwtAuthGuard)
   @Post('/update/:id')
   @HttpCode(HttpStatus.ACCEPTED)
   async updateUser(
+    @Request() req: SignedRequest,
     @Param('id') id: string,
-    @Body() user: UserUpdateInput,
+    @Body() user: Omit<UserUpdateInput, 'userId'>,
   ): Promise<ControllerResponse> {
+    const updaterId = req.user?.userId;
+    const userPayload = { ...user, userId: id };
     try {
-      const errors = await validateClassComposition(UserUpdateInput, user);
+      const errors = await validateClassComposition(
+        UserUpdateInput,
+        userPayload,
+      );
       if (errors.length) {
         throw new ApplicationError(errors.join(', '), 400);
       }
-      const result = await this.userService.updateUser(
-        user,
-        '66da741be1f11400d7d3e031',
-      );
+      const result = await this.userService.updateUser(userPayload, updaterId);
       return new ApplicationResponse(result, 202);
     } catch (error: any) {
       if (error instanceof UnauthorizedError) {
@@ -81,12 +87,13 @@ export class UserController {
       throw new ErrorResponse(error.message, error.status);
     }
   }
-
+  @UseGuards(JwtAuthGuard)
   @Delete('/delete/:id')
   @HttpCode(HttpStatus.OK)
-  async deleteUser(@Param('id') id: string) {
+  async deleteUser(@Request() req, @Param('id') id: string) {
+    const deletorId = req.user?.userId;
     try {
-      await this.userService.deleteUser(id, '66da741be1f11400d7d3e031');
+      await this.userService.deleteUser(id, deletorId);
     } catch (error: any) {
       if (error instanceof NotFoundError) {
         console.log(error.getDebugMessage());
