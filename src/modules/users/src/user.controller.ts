@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UserRecord, UserUpdateInput } from 'src/modules/repository';
 import { UserService } from './user.service';
@@ -20,12 +21,13 @@ import {
   validateClassComposition,
 } from 'src/modules/utils';
 import { NotFoundError } from 'src/modules/utils';
+import { JwtAuthGuard } from 'src/modules/auth';
 
 @Controller('/users')
 // TODO ADD AUTH GUARD FOR EXTRACTING AUTHOR
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
+  @UseGuards(JwtAuthGuard)
   @Get()
   @HttpCode(HttpStatus.OK)
   async getAllUsers(): Promise<ControllerResponse> {
