@@ -16,6 +16,7 @@ import {
   ApplicationResponse,
   ControllerResponse,
   ErrorResponse,
+  UnauthorizedError,
   validateClassComposition,
 } from 'src/modules/utils';
 import { NotFoundError } from 'src/modules/utils';
@@ -74,6 +75,9 @@ export class UserController {
       );
       return new ApplicationResponse(result, 202);
     } catch (error: any) {
+      if (error instanceof UnauthorizedError) {
+        console.log(error.getDebugMessage());
+      }
       throw new ErrorResponse(error.message, error.status);
     }
   }

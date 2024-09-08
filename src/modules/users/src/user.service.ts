@@ -19,8 +19,8 @@ export class UserService {
   }
 
   async getUser(userId: string): Promise<UserRecord> {
-    const result = await this.userRepository.getUserById(userId);
     isValidHexId(userId, 'userId');
+    const result = await this.userRepository.getUserById(userId);
     if (!result) {
       throw new NotFoundError('User', userId);
     }
@@ -69,6 +69,12 @@ export class UserService {
   ): Promise<UserRecord> {
     isValidHexId(userInfo.userId, 'user to update');
     const { userId, ...updates } = userInfo;
+    if ((updates as any).secret) {
+      throw new UnauthorizedError(
+        'Invalid operation',
+        'secret not allowed for change in this route',
+      );
+    }
     const userToUpdate: UserToUpdate = {
       ...updates,
       updatedBy: updaterId,
@@ -131,7 +137,7 @@ export class UserService {
     if (!user) {
       throw new NotFoundError(`${name} not found`, userId ?? emailAddress);
     }
-    if (!user.isEnabled || !user.isDeleted) {
+    if (!user.isEnabled || user.isDeleted) {
       throw new UnauthorizedError(`${name} not able to perform this operation`);
     }
   }
