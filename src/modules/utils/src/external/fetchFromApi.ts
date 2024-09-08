@@ -4,13 +4,17 @@ import { ApplicationError } from '../errors';
 export async function fetchFromApi<T>(
   url: string,
   path: string,
-  apiKey?: string,
+  apiKey: string,
+  additionalParams?: Record<string, string>,
   headers?: Record<string, string>,
 ): Promise<T> {
   try {
-    const keyPath = apiKey ? `?api_key=${apiKey}` : '';
-    console.log(keyPath);
-    const constructUrl = `${url}/${path}${keyPath}`;
+    const keyPath = `api_key=${apiKey}`;
+    const paramsPath = Object.keys(additionalParams)
+      .map((key) => `${key}=${additionalParams[key]}`)
+      .join('&');
+    console.log(additionalParams);
+    const constructUrl = `${url}/${path}?${keyPath}&${paramsPath}`;
     console.log(constructUrl);
     const result = await axios.get<T>(constructUrl, { headers });
     return result.data;
@@ -18,6 +22,7 @@ export async function fetchFromApi<T>(
     if (error instanceof ApplicationError) {
       throw error;
     }
+    console.log(error);
     throw new ApplicationError(`Unable to fetch: ${error.message}`);
   }
 }
