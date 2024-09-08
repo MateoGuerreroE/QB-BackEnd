@@ -67,6 +67,7 @@ export class UserService {
     userInfo: UserUpdateInput,
     updaterId: string,
   ): Promise<UserRecord> {
+    console.log(updaterId);
     isValidHexId(userInfo.userId, 'user to update');
     const { userId, ...updates } = userInfo;
     if ((updates as any).secret) {
@@ -127,7 +128,7 @@ export class UserService {
   ): Promise<void> {
     let user: UserRecord | null;
     if (userId) {
-      isValidHexId(userId);
+      isValidHexId(userId, 'for operation issuer');
       user = await this.userRepository.getUserById(userId);
     } else if (emailAddress) {
       user = await this.userRepository.getUserByEmail(emailAddress);
