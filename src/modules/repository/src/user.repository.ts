@@ -6,15 +6,15 @@ import { UserRecord, UserToCreate, UserToUpdate } from './types';
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getAllUsers() {
+  async getAllUsers(): Promise<UserRecord[]> {
     return this.prisma.user.findMany();
   }
 
-  async getUserById(userId: string): Promise<UserRecord> {
+  async getUserById(userId: string): Promise<UserRecord | null> {
     return this.prisma.user.findUnique({ where: { userId } });
   }
 
-  async getUserByEmail(emailAddress: string): Promise<UserRecord> {
+  async getUserByEmail(emailAddress: string): Promise<UserRecord | null> {
     return this.prisma.user.findUnique({ where: { emailAddress } });
   }
 
@@ -37,10 +37,13 @@ export class UserRepository {
     });
   }
 
-  async updateUser(userId: string, user: UserToUpdate): Promise<UserRecord> {
+  async updateUser(
+    userId: string,
+    attributesToUpdate: UserToUpdate,
+  ): Promise<UserRecord> {
     return this.prisma.user.update({
       where: { userId },
-      data: user,
+      data: attributesToUpdate,
     });
   }
 
