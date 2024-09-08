@@ -43,7 +43,7 @@ pnpm start:dev
 
 There's basically just CRUD routes for users and a login and register
 controller route, plus the external API call. For full documentation, please refer
-to our swagger detailed API docs [here](https://app.swaggerhub.com/apis/MATEOF1223/QB-Project/1.0.0#/)
+to our swagger detailed API docs [here](https://app.swaggerhub.com/apis-docs/MATEOF1223/QB-Project/1.0.0)
 
 ## Main dependencies
 
