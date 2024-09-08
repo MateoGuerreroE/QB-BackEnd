@@ -9,7 +9,6 @@ import { UserRecord } from 'src/modules/repository';
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    console.log(context.switchToHttp().getRequest());
     const result = (await super.canActivate(context)) as boolean;
     const request = context.switchToHttp().getRequest();
     const user = request.user;

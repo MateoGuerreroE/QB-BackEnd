@@ -67,7 +67,6 @@ export class UserService {
     userInfo: UserUpdateInput,
     updaterId: string,
   ): Promise<UserRecord> {
-    console.log(updaterId);
     isValidHexId(userInfo.userId, 'user to update');
     const { userId, ...updates } = userInfo;
     if ((updates as any).secret) {
