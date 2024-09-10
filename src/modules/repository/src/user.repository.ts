@@ -21,6 +21,19 @@ export class UserRepository {
     });
   }
 
+  async getUserFavorites(userId: string): Promise<string[] | null> {
+    const userValues = await this.prisma.user.findUnique({
+      where: { userId },
+      select: {
+        favorites: true,
+      },
+    });
+    if (!userValues) {
+      return null;
+    }
+    return userValues.favorites;
+  }
+
   async getUserByEmail(emailAddress: string): Promise<UserRecord | null> {
     return this.prisma.user.findUnique({
       where: { emailAddress },
