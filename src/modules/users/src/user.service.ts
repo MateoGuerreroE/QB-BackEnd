@@ -27,6 +27,15 @@ export class UserService {
     return result;
   }
 
+  async getUserFavorites(userId: string): Promise<string[]> {
+    isValidHexId(userId, 'caller');
+    const result = await this.userRepository.getUserFavorites(userId);
+    if (!result) {
+      throw new NotFoundError('User', userId);
+    }
+    return result;
+  }
+
   async getUserByEmail(userEmail: string): Promise<UserRecord> {
     const result = await this.userRepository.getUserByEmail(userEmail);
     if (!result) {
