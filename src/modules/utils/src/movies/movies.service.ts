@@ -8,7 +8,7 @@ export class MoviesService {
   constructor(private configService: ConfigService) {}
 
   async getMovieList(
-    path: 'now_playing' | 'top_rated' | 'popular' = 'now_playing',
+    path: 'now_playing' | 'top_rated' | 'popular' | 'upcoming' = 'now_playing',
     opts?: {
       page?: string;
       pageCount?: string;
