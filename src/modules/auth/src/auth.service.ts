@@ -7,10 +7,14 @@ import {
 import { ApplicationError, UnauthorizedError } from 'src/modules/utils';
 import { hashPassword, verifyPassword } from './utils';
 import { UserCreateInput } from 'src/modules/repository/src/dtos/UserCreateInput.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async loginUser(emailAddress: string, password: string): Promise<UserRecord> {
     const rawUser = await this.userRepository.getRawUserByEmail(emailAddress);
@@ -46,5 +50,15 @@ export class AuthService {
     } catch (error: any) {
       throw new ApplicationError(error.message);
     }
+  }
+
+  async generateJWTToken(user: UserRecord): Promise<string> {
+    const payload = {
+      sub: user.userId,
+      email: user.emailAddress,
+      isEnabled: user.isEnabled,
+      isDeleted: user.isDeleted,
+    };
+    return this.jwtService.sign(payload);
   }
 }
