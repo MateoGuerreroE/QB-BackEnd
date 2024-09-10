@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { fetchFromApi } from '../external';
-import { MovieResponse } from '../types';
+import { MovieData, MovieResponse } from '../types';
+import { ApplicationError } from '../errors';
 
 @Injectable()
 export class MoviesService {
@@ -23,6 +24,23 @@ export class MoviesService {
     }
     const result = await this.getList(path, opts?.page && parseInt(opts.page));
     return result;
+  }
+
+  async getMoviesById(movieIds: string[]): Promise<MovieResponse[]> {
+    const requests = movieIds.map((id) => this.getMovieById(id));
+    const result = await Promise.all(requests).catch((error) => {
+      throw new ApplicationError(`Invalid Ids to fetch: ${movieIds}`);
+    });
+    return result;
+  }
+
+  private async getMovieById(id: string) {
+    const basePath = `movie/${id}`;
+    return await fetchFromApi<MovieResponse>(
+      this.getTMBDUrl(),
+      basePath,
+      this.getApiKey(),
+    );
   }
 
   private getTMBDUrl() {
