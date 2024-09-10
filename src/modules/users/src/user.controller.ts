@@ -60,6 +60,25 @@ export class UserController {
       throw new ErrorResponse(error.message, error.status);
     }
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/favorites')
+  @HttpCode(HttpStatus.OK)
+  async getUserFavorites(
+    @Request() req: SignedRequest,
+  ): Promise<ControllerResponse> {
+    const userId = req.user.userId;
+    if (!userId) {
+      throw new ErrorResponse('Invalid JWT attributes', 400);
+    }
+    try {
+      const result = await this.userService.getUserFavorites(userId);
+      return new ApplicationResponse(result, 200);
+    } catch (error: any) {
+      throw new ErrorResponse(error.message, error.status ?? 500);
+    }
+  }
+
   @UseGuards(JwtAuthGuard)
   @Post('/update/:id')
   @HttpCode(HttpStatus.ACCEPTED)

@@ -1,6 +1,18 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { MoviesService } from './movies/movies.service';
-import { ApplicationResponse, ControllerResponse } from './responses';
+import {
+  ApplicationResponse,
+  ControllerResponse,
+  ErrorResponse,
+} from './responses';
 
 @Controller('/utils')
 export class UtilsController {
@@ -16,5 +28,16 @@ export class UtilsController {
       { page, pageCount: totalPages },
     );
     return new ApplicationResponse(results, 200, metadata);
+  }
+
+  @Post('/movies/ids')
+  async getMoviesByIdList(
+    @Body() reqBody: { ids: string[] },
+  ): Promise<ControllerResponse> {
+    if (!reqBody || !reqBody.ids) {
+      throw new ErrorResponse('Invalid Request', 400);
+    }
+    const movieList = await this.movieService.getMoviesById(reqBody.ids);
+    return new ApplicationResponse(movieList, 200);
   }
 }

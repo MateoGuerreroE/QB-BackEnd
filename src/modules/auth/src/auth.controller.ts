@@ -24,7 +24,8 @@ export class AuthController {
     const { emailAddress, password } = userInfo;
     try {
       const user = await this.authService.loginUser(emailAddress, password);
-      return new ApplicationResponse(user, 200);
+      const token = await this.authService.generateJWTToken(user);
+      return new ApplicationResponse({ ...user, token }, 200);
     } catch (error: any) {
       if (error instanceof UnauthorizedError) {
         console.log(error.getDebugMessage());
