@@ -10,10 +10,13 @@ export async function fetchFromApi<T>(
 ): Promise<T> {
   try {
     const keyPath = `api_key=${apiKey}`;
-    const paramsPath = Object.keys(additionalParams)
-      .map((key) => `${key}=${additionalParams[key]}`)
-      .join('&');
-    const constructUrl = `${url}/${path}?${keyPath}&${paramsPath}`;
+    const paramsPath = additionalParams
+      ? Object.keys(additionalParams)
+          .map((key) => `${key}=${additionalParams[key]}`)
+          .join('&')
+      : null;
+    const constructUrl = `${url}/${path}?${keyPath}&${paramsPath ?? ''}`;
+    console.log(constructUrl);
     const result = await axios.get<T>(constructUrl, { headers });
     return result.data;
   } catch (error: any) {
