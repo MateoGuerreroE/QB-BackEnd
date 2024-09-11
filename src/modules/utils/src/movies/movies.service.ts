@@ -9,10 +9,16 @@ export class MoviesService {
   constructor(private configService: ConfigService) {}
 
   async getMovieList(
-    path: 'now_playing' | 'top_rated' | 'popular' | 'upcoming' = 'now_playing',
+    path:
+      | 'now_playing'
+      | 'top_rated'
+      | 'popular'
+      | 'upcoming'
+      | 'recommended' = 'now_playing',
     opts?: {
       page?: string;
       pageCount?: string;
+      recommendedId?: string;
     },
   ): Promise<MovieResponse> {
     if (opts?.pageCount) {
@@ -22,7 +28,16 @@ export class MoviesService {
       );
       return result;
     }
-    const result = await this.getList(path, opts?.page && parseInt(opts.page));
+    if (path === 'recommended' && !opts.recommendedId) {
+      throw new ApplicationError(
+        'Movie id is needed to retrieve recommended movies',
+      );
+    }
+    const result = await this.getList(
+      path,
+      opts?.page && parseInt(opts.page),
+      opts.recommendedId,
+    );
     return result;
   }
 
@@ -61,13 +76,21 @@ export class MoviesService {
     return this.configService.get<string>('TMBD_API_KEY');
   }
 
-  private async getList(path: string, page: number = 1) {
+  private async getList(
+    path: string,
+    page: number = 1,
+    recommendedId?: string,
+  ) {
     const url = this.getTMBDUrl();
     const apiKey = this.getApiKey();
     const composePath = `movie/${path}`;
     const extraParams: Record<string, string> = {
       page: page.toString(),
     };
+    if (recommendedId) {
+      const customPath = `movie/${recommendedId}/recommendations`;
+      return fetchFromApi<MovieResponse>(url, customPath, apiKey);
+    }
     return fetchFromApi<MovieResponse>(url, composePath, apiKey, extraParams);
   }
 

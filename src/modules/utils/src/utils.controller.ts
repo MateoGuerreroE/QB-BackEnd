@@ -67,4 +67,24 @@ export class UtilsController {
       );
     }
   }
+
+  @Get('/movie/recommendations/:id')
+  async getMovieRecommendations(
+    @Param('id') id: string,
+  ): Promise<ControllerResponse> {
+    try {
+      const { results, ...metadata } = await this.movieService.getMovieList(
+        'recommended',
+        {
+          recommendedId: id,
+        },
+      );
+      return new ApplicationResponse(results, 200, metadata);
+    } catch (error: any) {
+      throw new ErrorResponse(
+        error.message,
+        error.status || error.code || error.statusCode || 500,
+      );
+    }
+  }
 }
