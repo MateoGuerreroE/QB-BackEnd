@@ -54,4 +54,17 @@ export class UtilsController {
       );
     }
   }
+
+  @Get('/movie/videos/:id')
+  async getMovieVideos(@Param('id') id: string): Promise<ControllerResponse> {
+    try {
+      const result = await this.movieService.getMovieVideos(id);
+      return new ApplicationResponse(result, 200);
+    } catch (error: any) {
+      throw new ErrorResponse(
+        error.message,
+        error.status || error.code || error.statusCode || 500,
+      );
+    }
+  }
 }

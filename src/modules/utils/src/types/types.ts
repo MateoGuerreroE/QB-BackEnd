@@ -27,3 +27,16 @@ export interface MovieResponse {
 export interface SignedRequest extends Request {
   user?: Partial<UserRecord>;
 }
+
+export interface VideoInfo {
+  name: string;
+  site: string;
+  type: string;
+  official: boolean;
+  ket: string;
+}
+
+export interface VideoReponse {
+  id: number;
+  results: VideoInfo[];
+}

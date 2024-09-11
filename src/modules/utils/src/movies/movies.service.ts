@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { fetchFromApi } from '../external';
-import { MovieData, MovieResponse } from '../types';
+import { MovieData, MovieResponse, VideoInfo, VideoReponse } from '../types';
 import { ApplicationError } from '../errors';
 
 @Injectable()
@@ -41,6 +41,16 @@ export class MoviesService {
       basePath,
       this.getApiKey(),
     );
+  }
+
+  async getMovieVideos(id: string): Promise<VideoInfo[]> {
+    const basePath = `movie/${id}/videos`;
+    const baseResults = await fetchFromApi<VideoReponse>(
+      this.getTMBDUrl(),
+      basePath,
+      this.getApiKey(),
+    );
+    return baseResults.results;
   }
 
   private getTMBDUrl() {
