@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Query,
 } from '@nestjs/common';
@@ -39,5 +40,18 @@ export class UtilsController {
     }
     const movieList = await this.movieService.getMoviesById(reqBody.ids);
     return new ApplicationResponse(movieList, 200);
+  }
+
+  @Get('movie/:id')
+  async getMovie(@Param('id') id: string): Promise<ControllerResponse> {
+    try {
+      const result = await this.movieService.getMovieById(id);
+      return new ApplicationResponse(result, 200);
+    } catch (error: any) {
+      throw new ErrorResponse(
+        error.message,
+        error.status || error.code || error.statusCode || 500,
+      );
+    }
   }
 }
