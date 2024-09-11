@@ -29,12 +29,12 @@ export class MoviesService {
   async getMoviesById(movieIds: string[]): Promise<MovieResponse[]> {
     const requests = movieIds.map((id) => this.getMovieById(id));
     const result = await Promise.all(requests).catch((error) => {
-      throw new ApplicationError(`Invalid Ids to fetch: ${movieIds}`);
+      throw new ApplicationError(`Invalid Ids to fetch: ${movieIds}, ${error}`);
     });
     return result;
   }
 
-  private async getMovieById(id: string) {
+  async getMovieById(id: string): Promise<MovieResponse> {
     const basePath = `movie/${id}`;
     return await fetchFromApi<MovieResponse>(
       this.getTMBDUrl(),
