@@ -40,3 +40,12 @@ export interface VideoReponse {
   id: number;
   results: VideoInfo[];
 }
+
+export interface GenreInfo {
+  id: number;
+  name: string;
+}
+
+export interface GenreResponse {
+  genres: GenreInfo[];
+}

@@ -68,7 +68,7 @@ export class UtilsController {
     }
   }
 
-  @Get('/movie/recommendations/:id')
+  @Get('/movies/recommendations/:id')
   async getMovieRecommendations(
     @Param('id') id: string,
   ): Promise<ControllerResponse> {
@@ -79,6 +79,47 @@ export class UtilsController {
           recommendedId: id,
         },
       );
+      return new ApplicationResponse(results, 200, metadata);
+    } catch (error: any) {
+      throw new ErrorResponse(
+        error.message,
+        error.status || error.code || error.statusCode || 500,
+      );
+    }
+  }
+
+  @Get('/getGenreList')
+  async getMovieGenres(): Promise<ControllerResponse> {
+    try {
+      const result = await this.movieService.getMovieGenres();
+      return new ApplicationResponse(result.genres, 200);
+    } catch (error: any) {
+      throw new ErrorResponse(
+        error.message,
+        error.status || error.code || error.statusCode || 500,
+      );
+    }
+  }
+
+  @Get('/movies/genre/:id')
+  async getMoviesByGenre(@Param('id') id: string): Promise<ControllerResponse> {
+    try {
+      const result = await this.movieService.getMoviesByGenre(id);
+      const { results, ...metadata } = result;
+      return new ApplicationResponse(results, 200, metadata);
+    } catch (error: any) {
+      throw new ErrorResponse(
+        error.message,
+        error.status || error.code || error.statusCode || 500,
+      );
+    }
+  }
+
+  @Get('/movies/search')
+  async getMoviesByKeyword(@Query('key') key: string) {
+    try {
+      const result = await this.movieService.getMoviesByKeyword(key);
+      const { results, ...metadata } = result;
       return new ApplicationResponse(results, 200, metadata);
     } catch (error: any) {
       throw new ErrorResponse(

@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { fetchFromApi } from '../external';
-import { MovieData, MovieResponse, VideoInfo, VideoReponse } from '../types';
+import {
+  GenreResponse,
+  MovieData,
+  MovieResponse,
+  VideoInfo,
+  VideoReponse,
+} from '../types';
 import { ApplicationError } from '../errors';
 
 @Injectable()
@@ -111,5 +117,45 @@ export class MoviesService {
       movies.page = times;
     }
     return movies;
+  }
+
+  async getMovieGenres(): Promise<GenreResponse> {
+    const customPath = 'genre/movie/list';
+    const results = await fetchFromApi<GenreResponse>(
+      this.getTMBDUrl(),
+      customPath,
+      this.getApiKey(),
+      {},
+    );
+    return results;
+  }
+
+  async getMoviesByGenre(genreId: string): Promise<MovieResponse> {
+    const path = 'discover/movie';
+    const params = {
+      with_genres: genreId,
+    };
+    const results = await fetchFromApi<MovieResponse>(
+      this.getTMBDUrl(),
+      path,
+      this.getApiKey(),
+      params,
+    );
+    return results;
+  }
+
+  async getMoviesByKeyword(searchKey: string): Promise<MovieResponse> {
+    if (!searchKey) throw new ApplicationError('Key is needed');
+    const path = 'search/movie';
+    const params = {
+      query: searchKey,
+    };
+    const results = await fetchFromApi<MovieResponse>(
+      this.getTMBDUrl(),
+      path,
+      this.getApiKey(),
+      params,
+    );
+    return results;
   }
 }
